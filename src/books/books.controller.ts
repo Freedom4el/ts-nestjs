@@ -9,7 +9,11 @@ import {
   NotFoundException,
   Inject,
   BadRequestException,
+  UsePipes,
 } from '@nestjs/common';
+import { createBookSchema } from 'src/common/joi/create-book.schema';
+import { JoiValidationPipe } from 'src/common/pipes/joi-validation.pipe';
+import { ParseIdPipe } from 'src/common/pipes/parse-id.pipe';
 import { CreateBook } from './models/create-book';
 import { UpdateBook } from './models/update-book';
 import { ApiTags } from '@nestjs/swagger';
@@ -27,6 +31,7 @@ export class BooksController {
   ) {}
 
   @Post()
+  @UsePipes(new JoiValidationPipe(createBookSchema))
   async create(
     @Body() createBook: CreateBook,
   ): Promise<IBook | BadRequestException> {
@@ -47,7 +52,7 @@ export class BooksController {
 
   @Get(':id')
   async findOne(
-    @Param('id') id: string,
+    @Param('id', new ParseIdPipe()) id: string,
   ): Promise<IBook | NotFoundException> {
     const book = await this.booksService.findOne(id);
     if (!book) {
@@ -61,7 +66,7 @@ export class BooksController {
 
   @Patch(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', new ParseIdPipe()) id: string,
     @Body() updateBook: UpdateBook,
   ): Promise<IBook | NotFoundException> {
     const book = await this.booksService.update(id, updateBook);
@@ -74,7 +79,7 @@ export class BooksController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<string | NotFoundException> {
+  async remove(@Param('id', new ParseIdPipe()) id: string): Promise<string | NotFoundException> {
     const result = await this.booksService.remove(id);
     if (!result) {
       return new NotFoundException({
