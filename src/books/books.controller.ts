@@ -1,19 +1,20 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+  UsePipes,
   NotFoundException,
   Inject,
   BadRequestException,
-  UsePipes,
+  Patch,
 } from '@nestjs/common';
-import { createBookSchema } from 'src/common/joi/create-book.schema';
-import { JoiValidationPipe } from 'src/common/pipes/joi-validation.pipe';
-import { ParseIdPipe } from 'src/common/pipes/parse-id.pipe';
+import { createBookSchema } from '../common/joi/create-book.schema';
+import { JoiValidationPipe } from '../common/pipes/joi-validation.pipe';
+import { ParseIdPipe } from '../common/pipes/parse-id.pipe';
 import { CreateBook } from './models/create-book';
 import { UpdateBook } from './models/update-book';
 import { ApiTags } from '@nestjs/swagger';
@@ -22,6 +23,7 @@ import {
   IBooksService,
 } from './services/i-book.service';
 import { IBook } from './models/book';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @ApiTags('books')
 @Controller('books')
@@ -31,6 +33,7 @@ export class BooksController {
   ) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @UsePipes(new JoiValidationPipe(createBookSchema))
   async create(
     @Body() createBook: CreateBook,
@@ -46,11 +49,13 @@ export class BooksController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   async findAll(): Promise<IBook[]> {
     return await this.booksService.findAll();
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   async findOne(
     @Param('id', new ParseIdPipe()) id: string,
   ): Promise<IBook | NotFoundException> {
@@ -65,6 +70,7 @@ export class BooksController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   async update(
     @Param('id', new ParseIdPipe()) id: string,
     @Body() updateBook: UpdateBook,
@@ -79,6 +85,7 @@ export class BooksController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   async remove(@Param('id', new ParseIdPipe()) id: string): Promise<string | NotFoundException> {
     const result = await this.booksService.remove(id);
     if (!result) {
