@@ -22,5 +22,11 @@ import { BooksMongoRepository } from './repositories/books-mongo.repository';
       useClass: BooksService,
     },
   ],
+  exports: [
+    {
+      provide: I_BOOK_SERVICE,
+      useClass: BooksService,
+    },
+  ],
 })
 export class BooksModule {}
