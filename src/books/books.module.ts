@@ -6,6 +6,7 @@ import { I_BOOK_REPOSITORY } from './repositories/i-book.repository';
 import { I_BOOK_SERVICE } from './services/i-book.service';
 import { Book, BookSchema } from './models/book';
 import { BooksMongoRepository } from './repositories/books-mongo.repository';
+import { BooksFirestoreRepository } from './repositories/books-firestore.repository';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { BooksMongoRepository } from './repositories/books-mongo.repository';
   providers: [
     {
       provide: I_BOOK_REPOSITORY,
-      useClass: BooksMongoRepository,
+      useClass: BooksFirestoreRepository,
     },
     {
       provide: I_BOOK_SERVICE,
